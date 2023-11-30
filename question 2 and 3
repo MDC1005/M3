@@ -1,0 +1,45 @@
+k0 = 0.2 #production - edit 
+k1 = 0.01 # degradation - edit 
+stoichiometry = [1,-1]
+
+def propensities(x):
+    return [k0, k1*x]
+#assuming that cell volume is one
+
+def reaction_times(x):
+    a = propensities(x)
+    aInv =[ 1/s if s>0 else np.inf for s in a ]
+    return -np.log(rand(2)) * aInv
+  
+def ssa_step(x, tIn, tOut):
+    #take the state x at timr tIn and return at time tOut
+    t = tIn
+    
+    while t < tOut: 
+        rt = reaction_times(x)
+        idx = np.argmin(rt)
+        tau = np.min(rt)
+        # find the index of the smallest number in the vector list of xn times
+       #tau = rt[idx]
+
+    
+        x += stoichiometry[idx]
+        t += tau
+    return x
+    # modify code to return the state of the system at tOut 
+dt =1 #change in time between each measurement
+x = 0 #set to zero for quaestion one and 20 for question 3 
+t = 0 #initial time (keep 0)
+
+#want to save the trajectory somewhere
+mrna = [x]
+time = [t] 
+for i in range(1000) : 
+        x = ssa_step(x, t, t+dt)
+        t += dt
+        mrna.append(x)
+        time.append(t)
+plt.xlabel('Time (Seconds)')
+plt.ylabel('mRNA')
+plt.plot(time, mrna)
+
