@@ -1,0 +1,81 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+
+# Constants
+k1 = 0.01  # Degradation rate
+k2 = 5.0  # Translation rate
+k3 = 1.0  # Protein degradation rate
+stoichiometry = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+
+# Function to generate a fixed random transcription rates
+def generate_transcription_rate():
+    rand = np.random.uniform(low=-3, high=1)
+    return 2 * 10**rand
+
+# Functions
+def propensities(x, transcription_rate):
+    return [transcription_rate, k1 * x[0], k2 * x[0], k3 * x[1]]
+
+def reaction_times(x, transcription_rate):
+    a = propensities(x, transcription_rate)
+    aInv = [1 / s if s > 0 else np.inf for s in a]
+    num_reactions = len(a)
+    return -np.log(np.random.rand(num_reactions)) * aInv
+
+def ssa_step(x, tIn, tOut, transcription_rate):
+    t = tIn
+    while t < tOut:
+        rt = reaction_times(x, transcription_rate)
+        idx = np.argmin(rt)
+        tau = np.min(rt)
+
+        x[0] += stoichiometry[idx][0]
+        x[1] += stoichiometry[idx][1]
+        t += tau
+    return x
+
+# Simulation
+dt = 1
+num_simulations = 500
+
+# Initialize lists to store mean protein levels, variances, and transcription rates
+mean_protein_list = []
+variance_protein_list = []
+transcription_rate_list = []
+mean_mRNA_list = []
+variance_mRNA_list = []
+std_protein_list = []
+std_mRNA_list = []
+CV_mRNA_list = []
+CV_protein_list = []
+
+for _ in tqdm(range(num_simulations), desc='simulation', unit='simulation'):
+    # Reset initial conditions for each simulation
+    x = [0, 0]  # Initial state: [mRNA, Protein]
+    t = 0
+    mRNA = [x[0]]  # Initialize mRNA list
+
+    # Generate a new random transcription rate for each simulation
+    transcription_rate = generate_transcription_rate()
+
+    protein = [x[1]]
+    time = [t]
+
+    for _ in range(1000):
+        x = ssa_step(x, t, t + dt, transcription_rate)
+        t += dt
+        protein.append(x[1])
+        mRNA.append(x[0])  # Update mRNA list
+        time.append(t)
+
+    # Calculate statistics for each simulation and append to the lists
+    mean_protein_list.append(np.mean(protein))
+    mean_mRNA_list.append(np.mean(mRNA))
+    variance_protein_list.append(np.var(protein))
+    variance_mRNA_list.append(np.var(mRNA))
+    transcription_rate_list.append(transcription_rate)
+    std_protein_list.append(np.std(protein))
+    std_mRNA_list.append(np.std(mRNA))
+    CV_protein_list.append((np.std(protein)**2) / (np.mean(protein)**2))
+    CV_mRNA_list.append((np.std(mRNA)**2) / (np.mean(mRNA)**2))
