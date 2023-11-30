@@ -1,0 +1,56 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Constants
+k0 = 0.2  # Production rate 
+k1 = 0.01  # Degradation rate
+k2 = 5.0  # Translation rate 
+k3 = 1.0  # Protein degradation rate 
+stoichiometry = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+
+# Functions
+def propensities(x):
+    return [k0, k1 * x[0], k2 * x[0], k3 * x[1]] 
+# 0 = system relies on current mRNA level 
+#1 = system relies on current protein level
+
+def reaction_times(x):
+    a = propensities(x)
+    aInv = [1 / s if s > 0 else np.inf for s in a]
+    return -np.log(np.random.rand(4)) * aInv # now we need 4 random numbers 
+
+def ssa_step(x, tIn, tOut):
+    t = tIn
+    while t < tOut:
+        rt = reaction_times(x)
+        idx = np.argmin(rt)
+        tau = np.min(rt)
+
+       
+        x[0] += stoichiometry[idx][0] #update to add protien as well as mRNA (x += stoichiometry[idx])
+        x[1] += stoichiometry[idx][1]
+        t += tau
+    return x
+
+# Simulation
+dt = 1
+x = [20, 100]  # Initial state: [mRNA, Protein]
+t = 0
+
+# want to save the trajectory somewhere 
+protein = [x[1]] #[x[1]] will plot protien levels 
+time = [t]
+
+for _ in range(1000):
+    x = ssa_step(x, t, t + dt)
+    t += dt
+    protein.append(x[1]) #[x[1]] will plot protien levels 
+    time.append(t)
+
+
+plt.xlabel('Time (Seconds)')
+plt.ylabel('Protein ')
+plt.plot(time, protein)
+plt.show()
+
+np.mean(protein), np.var(protein)
