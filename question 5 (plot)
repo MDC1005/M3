@@ -1,0 +1,78 @@
+# Plot mean protein and mRNA level against transcription rate
+plt.figure(figsize=(8, 6))
+#plt.subplot(1, 2, 2)
+plt.scatter(transcription_rate_list, mean_protein_list, alpha=0.5, color='red',label='Protein')
+plt.scatter(transcription_rate_list, mean_mRNA_list, alpha=0.5, color='blue', label='mRNA')
+plt.xlabel('Transcription Rate')
+plt.ylabel('Mean Level')
+plt.legend()
+plt.show()
+
+
+# Plot variance of protein level and mRNA against mean protein level
+plt.figure(figsize=(8, 6))
+#plt.subplot(1, 2, 2)
+plt.scatter(mean_protein_list, variance_protein_list, alpha=0.5, color='red')
+plt.xlabel('mean Protein level')
+plt.ylabel('Variance')
+plt.show()
+
+# Plot variance of protein level and mRNA against mean protein level
+plt.figure(figsize=(8, 6))
+#plt.subplot(1, 2, 2)
+plt.scatter(mean_mRNA_list, variance_mRNA_list, alpha=0.5 , color='blue')
+plt.xlabel('mean mRNA level')
+plt.ylabel('Variance')
+plt.show()
+
+
+# Plot coefficient of variation of mRNA level against mean mRNA
+plt.figure(figsize=(8, 6))
+#plt.subplot(1, 2, 2)
+plt.scatter(mean_mRNA_list, CV_mRNA_list, alpha=0.5, color='red')
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel('log (mean mRNA level)')
+plt.ylabel('log (coefficient of variation)')
+plt.show()
+
+# Plot coefficient of variation of protein level against mean protein
+plt.figure(figsize=(8, 6))
+#plt.subplot(1, 2, 2)
+plt.scatter(mean_protein_list, CV_protein_list, alpha=0.5, color = 'blue')
+plt.title('noise vs mean protein')
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel('log (mean protein level)')
+plt.ylabel('log (coefficient of variation)')
+plt.show()
+plt.hist(transcription_rate_list,)
+plt.title('density histogram')
+plt.xlabel('transcription rate')
+plt.ylabel('density')
+
+plt.hist(mean_mRNA_list, color = 'red')
+plt.title('density histogram')
+plt.xlabel('mean mRNA')
+plt.ylabel('density')
+
+plt.hist(mean_protein_list, color = 'blue')
+plt.title('density histogram')
+plt.xlabel('mean Protein')
+plt.ylabel('density')
+
+# plot the random transcription rates 
+rand = []
+transcription_rate = []
+
+for i in range(500):
+    rand.append(np.random.uniform(-3, 1))
+    
+for value in rand:
+    transcription_rate.append(2*10**value)
+    
+plt.scatter(range(500), transcription_rate)
+plt.yscale ('log')
+plt.ylabel('transcripiton rate')
+
+plt.show()
